@@ -1,0 +1,43 @@
+function output_array = emulate_forcing_to_T(params,CO2_forcing,SAI_forcing,emulation_time)
+offset = 0; 
+target = 1.5-1.6250;
+output_array = zeros(length(emulation_time),1);
+AOD_needed_for_target = 0*emulation_time;
+SO4_needed_for_target = 0*emulation_time;
+impulse_p_CO2 = [];
+impulse_p_CO2.tau = params(1);
+impulse_p_CO2.mu = params(2);
+
+impulse_p_SAI = [];
+impulse_p_SAI.tau = params(1);
+impulse_p_SAI.mu = params(3);
+
+%AOD Stuff
+SO4_to_AOD_conversion = 0.0131;
+efficiency_loss_frac = .83;
+x_star = 7;
+%End AOD Stuff
+
+for k = 1:length(emulation_time)
+    SUM_hf = 0;
+
+%     for j = 1:k
+%         SUM_hf = SUM_hf + impulse_semiInfDiff(j+offset,impulse_p_CO2)*CO2_forcing(k-j+1)+ impulse_semiInfDiff(j+offset,impulse_p_SAI)*SAI_forcing(k-j+1);
+%     end
+    for j = k:-1:1
+        if j == 1
+            AOD_needed_for_target(k) = (target - SUM_hf - impulse_semiInfDiff(j,impulse_p_CO2)*CO2_forcing(k-j+1))/impulse_semiInfDiff(j,impulse_p_SAI);
+            if AOD_needed_for_target(k) > SO4_to_AOD_conversion*x_star
+                SO4_needed_for_target(k) = (AOD_needed_for_target(k)/SO4_to_AOD_conversion/(x_star^(1-efficiency_loss_frac)))^(1/efficiency_loss_frac);
+            else
+                SO4_needed_for_target(k) = AOD_needed_for_target(k)/SO4_to_AOD_conversion;
+            end
+        end
+        
+        SUM_hf = SUM_hf + impulse_semiInfDiff(j,impulse_p_CO2)*CO2_forcing(k-j+1)+ impulse_semiInfDiff(j,impulse_p_SAI)*SAI_forcing(k-j+1);
+        
+    end
+    output_array(k) = SUM_hf;
+end
+[AOD_needed_for_target SO4_needed_for_target];
+end

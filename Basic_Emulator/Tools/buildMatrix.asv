@@ -1,0 +1,20 @@
+function M = buildMatrix(var,scaling,run,suffix,years,ensemble_numbers)
+% Create a 4d matrix of GAUSS data (lon, lat, time, ensemble member)
+
+
+M = [];
+[~,lon] = getLatLon(var,scaling,run,suffix,years,ensemble_numbers(1));
+
+for i = ensemble_numbers
+    if strcmp(var, 'P-E')
+        tseries = readAndSubtract('PRECT',1000*24*60*60,'QFLX',1,run,suffix)
+    else
+        tseries = readFromGAUSS(var,scaling,run,suffix,years,i);
+    end
+tseries = [tseries; tseries(lon == 0,:,:)];
+M = cat(4,M,tseries);
+end
+
+
+
+end
