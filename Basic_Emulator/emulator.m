@@ -50,7 +50,6 @@ Interrupt_1y_in_2055 = createEasyInconsistentInj("default",[2055 0 2055 11],@(ye
 Phase_Out_30y_in_2055 = createEasyInconsistentInj("default",[2055 0 inf 11],@(year,last_base_inj,curr_base_inj) max(1-floor(year-2054)/30,0)*last_base_inj,'#dd6c00'); % 30-year phase-out (stays below 0.5°C/decade)
 Termination_in_2055 = createEasyInconsistentInj("default",[2055 0 inf 11],@(year,last_base_inj,curr_base_inj) 0,'#dd7b00'); % Termination in 2055, as simulated in the paper
 Interrupt_1y_in_2055_and_2064 = createEasyInconsistentInj("default",[2055 0 inf 11],@(year,last_base_inj,curr_base_inj) (year~=2055&&year~=2064)*curr_base_inj, 'm'); % Use logic to check when certain conditions are fulfilled
-Emergency_Brake = createEasyInconsistentInj("no_sai",[2075 0 inf 11],@(year,last_base_inj,curr_base_inj) .44, 'm');
 
 %% Code
 % Add paths and initialize figures
